@@ -104,7 +104,7 @@ resource "azurerm_linux_virtual_machine" "testvm" {
   resource_group_name = azurerm_resource_group.testrg.name
   location            = azurerm_resource_group.testrg.location
   size                = "Standard_B2s"
-  admin_username      = "adminuser"
+  admin_username      = "vm-user-name"
 
   network_interface_ids = [
     azurerm_network_interface.testnic.id,
@@ -115,8 +115,8 @@ resource "azurerm_linux_virtual_machine" "testvm" {
   
 
   admin_ssh_key {
-    username   = "adminuser"
-    public_key = file("./aztf_rsa.pub")
+    username   = "vm-user-name"
+    public_key = file("/path/to/public/ssh-key")
   }
 
   os_disk {
@@ -132,16 +132,16 @@ resource "azurerm_linux_virtual_machine" "testvm" {
   }
   connection {
       type = "ssh"
-      user = "adminuser"
-      private_key = file("~/.ssh/aztf_rsa")
+      user = "vm-user-name"
+      private_key = file("/path/to/local/private/ssh_keys")
       host = self.public_ip_address
   }
 
   provisioner "local-exec" {
     command = templatefile("linux-ssh-scripts.tftpl", {
       hostname     = self.public_ip_address,
-      user         = "adminuser",
-      identityfile = "/home/bijay/.ssh/aztf_rsa"
+      user         = "vm-user-name",
+      identityfile = "/path/to/local/private/ssh_keys"
     })
     interpreter = ["bash", "-c"]
   }
